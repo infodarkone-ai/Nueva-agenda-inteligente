@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARK ONE - Citas Rápida v3.0</title>
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon 2.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32 2.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16 2.png">
+    <link rel="manifest" href="icons/site.webmanifest">
+    <link rel="shortcut icon" href="icons/favicon 2.ico" type="image/x-icon">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark-one': '#e11d48',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#121212] min-h-screen p-4 sm:p-8">
+
+    <div class="max-w-4xl mx-auto bg-gray-900 shadow-2xl rounded-lg p-6 sm:p-10">
+
+        <header class="mb-8">
+            <div class="flex items-center space-x-4 mb-2"> 
+                <img src="icons/android-chrome-192x192 2.png" alt="Logo Dark One" class="h-10 w-10 sm:h-12 sm:w-12 rounded-full"> 
+                
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-[#e11d48]">DARK ONE - Agenda Rápida</h1>
+            </div>
+            <p class="text-gray-400 mb-6">Generador de Mensajes WhatsApp y Eventos Google Calendar para citas.</p>
+
+            <div class="bg-gray-800 p-4 rounded-lg shadow-inner border border-gray-700">
+                <h2 class="text-xl font-semibold text-white mb-3">Utilidades</h2>
+
+                <div id="statusMessage" class="hidden flex items-center p-3 rounded-lg mb-3" role="alert">
+                    </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="copyPlantillaText()" class="flex items-center px-4 py-2 bg-gray-700 text-white rounded-lg text-sm font-medium hover:bg-gray-600 transition duration-150">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v6h6M11 15h6M11 19h6M11 11h6"/></svg>
+                        Copiar Plantilla Pegado Rápido
+                    </button>
+
+                    <button id="toggleTransferButton" type="button" onclick="toggleTransferData()" class="flex items-center px-4 py-2 bg-gray-700 text-white rounded-lg text-sm font-medium hover:bg-gray-600 transition duration-150">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+                        Datos de Transferencia
+                    </button>
+                    
+                    <button type="button" onclick="copyReviewsMessage()" class="flex items-center px-4 py-2 bg-gray-700 text-white rounded-lg text-sm font-medium hover:bg-gray-600 transition duration-150">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M3 16l-3 6 6-3 12-12-3-3zM15 4l-11 11M19 1l-3 3M19 13.5v7.5h-10v-7.5l5 2.5 5-2.5z"/></svg>
+                        Copiar Msj Opinión
+                    </button>
+                </div>
+
+                <div id="transferDataContainer" class="hidden mt-4 bg-gray-700 p-3 rounded-lg text-gray-200 whitespace-pre-wrap text-sm border border-gray-600">
+                    <pre id="transferDataText" class="font-mono"></pre>
+                </div>
+            </div>
+        </header>
+
+        <div class="bg-gray-800 p-4 rounded-lg shadow-inner border border-gray-700 mb-8">
+            <h2 class="text-xl font-semibold text-white mb-3">Pegado Rápido de Datos</h2>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <textarea id="pasteInput" rows="3" placeholder="Pegue aquí el texto de la plantilla de WhatsApp (Nombre:..., Número:...)" class="flex-grow p-2 bg-gray-700 text-gray-100 rounded-lg border border-gray-600 focus:ring-[#e11d48] focus:border-[#e11d48]"></textarea>
+                <button type="button" id="processPasteButton" class="sm:self-end px-4 py-2 bg-[#e11d48] text-white rounded-lg font-bold hover:bg-red-700 transition duration-150 flex-shrink-0">
+                    Procesar Datos
+                </button>
+            </div>
+        </div>
+
+        <form id="appointmentForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div class="md:col-span-2 bg-gray-800 p-5 rounded-lg border border-gray-700">
+                <h2 class="text-xl font-semibold text-[#e11d48] mb-4">Datos del Cliente</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="clientName" class="block text-sm font-medium text-gray-300">Nombre Completo <span class="text-red-500">*</span></label>
+                        <input type="text" id="clientName" required class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#e11d48] focus:border-[#e11d48]">
+                    </div>
+                    <div>
+                        <label for="clientPhone" class="block text-sm font-medium text-gray-300">Número WhatsApp (Ej: +569XXXXXXXX) <span class="text-red-500">*</span></label>
+                        <input type="tel" id="clientPhone" required minlength="10" placeholder="+569" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#e11d48] focus:border-[#e11d48]">
+                    </div>
+                    <div>
+                        <label for="clientEmail" class="block text-sm font-medium text-gray-300">Correo Electrónico (Para Calendar) <span class="text-red-500">*</span></label>
+                        <input type="email" id="clientEmail" required placeholder="correo@ejemplo.com" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#e11d48] focus:border-[#e11d48]">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+                <h2 class="text-xl font-semibold text-[#e11d48] mb-4">Detalles del Servicio</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="serviceType" class="block text-sm font-medium text-gray-300">Tipo de Servicio</label>
+                        <select id="serviceType" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#e11d48] focus:border-[#e11d48]">
+                            <option value="Tatuaje">Tatuaje</option>
+                            <option value="Piercing">Piercing</option>
+                            <option value="Piercing Menor de Edad">Piercing Menor de Edad (con tutor)</option>
+                            <option value="Tratamiento Granuloma">Tratamiento Granuloma</option>
+                            <option value="Reserva de Retoques">Reserva de Retoques</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="abono" class="block text-sm font-medium text-gray-300">Abono (CLP - Solo números)</label>
+                        <input type="number" id="abono" min="0" value="0" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#e11d48] focus:border-[#e11d48]">
+                    </div>
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-300">Notas de Servicio (Opcional)</label>
+                        <textarea id="description" rows="2" placeholder="Ej: Flor de Loto, 10cm" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#e11d48] focus:border-[#e11d48]"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+                <h2 class="text-xl font-semibold text-[#e11d48] mb-4">Horario y Fecha</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="appointmentDate" class="block text-sm font-medium text-gray-300">Fecha de la Cita <span class="text-red-500">*</span></label>
+                        <input type="date" id="appointmentDate" required class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#e11d48] focus:border-[#e11d48]">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Hora de Inicio <span class="text-red-500">*</span></label>
+                        <div class="mt-1 flex gap-2">
+                            <select id="appointmentStartHour" required class="w-1/2 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#e11d48] focus:border-[#e11d48]"></select>
+                            <select id="appointmentStartMinute" required class="w-1/2 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#e11d48] focus:border-[#e11d48]">
+                                <option value="00">00</option>
+                                <option value="15">15</option>
+                                <option value="30">30</option>
+                                <option value="45">45</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Hora de Término <span class="text-red-500">*</span></label>
+                        <div class="mt-1 flex gap-2">
+                            <select id="appointmentEndHour" required class="w-1/2 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#e11d48] focus:border-[#e11d48]"></select>
+                            <select id="appointmentEndMinute" required class="w-1/2 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#e11d48] focus:border-[#e11d48]">
+                                <option value="00">00</option>
+                                <option value="15">15</option>
+                                <option value="30">30</option>
+                                <option value="45">45</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 mt-4">
+                <button type="submit" class="w-full py-4 bg-[#e11d48] text-white font-extrabold rounded-lg text-lg hover:bg-red-700 transition duration-150 shadow-lg">
+                    GENERAR RESUMEN DE CITA
+                </button>
+            </div>
+        </form>
+
+        <div id="outputContainer" class="hidden mt-10 p-6 bg-gray-800 rounded-lg shadow-xl border border-gray-700">
+            <h2 class="text-2xl font-bold text-[#e11d48] mb-4">Resultados Generados</h2>
+
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xl font-semibold text-white">Mensaje de WhatsApp</h3>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="copyToClipboard('resumenTexto', 'Mensaje de WhatsApp')" class="px-3 py-1 bg-gray-700 text-white rounded-lg text-sm hover:bg-gray-600 transition">Copiar</button>
+                        <a id="whatsappLink" href="#" target="_blank" class="px-3 py-1 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Abrir WA
+                        </a>
+                    </div>
+                </div>
+                <textarea id="resumenTexto" readonly rows="8" class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 whitespace-pre-wrap font-mono text-sm"></textarea>
+            </div>
+
+            <div>
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xl font-semibold text-white">Evento Google Calendar (<span id="calendarTargetName" class="text-[#e11d48]"></span>)</h3>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="copyUrlToClipboard(getElement('calendarLink').href, 'URL de Calendar')" class="px-3 py-1 bg-gray-700 text-white rounded-lg text-sm hover:bg-gray-600 transition">Copiar URL</button>
+                        <a id="calendarLink" href="#" target="_blank" class="px-3 py-1 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            Abrir Calendar
+                        </a>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-400 p-2 bg-gray-700 rounded-lg border border-gray-600">Haga clic en el botón **Abrir Calendar** y luego en **Guardar** en la página de Google para crear la cita.</p>
+            </div>
+        </div>
+
+        <p class="mt-8 text-xs text-gray-500 text-center">
+            Desarrollado por <span class="text-[#e11d48]">DarkOne Apps</span>
+        </p>
+    </div>
+    
+    <script src="content.js"></script>
+
+    <script>
+        // --- UTILIDADES ---
+        const getElement = id => document.getElementById(id); 
+        
+        const formatDate = (dateStr) => {
+            const [year, month, day] = dateStr.split('-');
+            const date = new Date(year, month - 1, day);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('es-ES', options);
+        };
+        const getTodayDate = () => {
+            return new Date().toISOString().slice(0, 10);
+        };
+        const formatCalendarTimeLocal = (date, time) => {
+            const [year, month, day] = date.split('-');
+            const [hour, minute] = time.split(':');
+            const dt = new Date(year, month - 1, day, hour, minute);
+            
+            const toTz = (dateObj) => {
+                const pad = (n) => (n < 10 ? '0' : '') + n;
+                const year = dateObj.getFullYear();
+                const month = pad(dateObj.getMonth() + 1);
+                const day = pad(dateObj.getDate());
+                const hour = pad(dateObj.getHours());
+                const minute = pad(dateObj.getMinutes());
+                const second = pad(dateObj.getSeconds());
+                return `${year}${month}${day}T${hour}${minute}${second}`;
+            };
+            return toTz(dt);
+        };
+        
+        // Función general para copiar texto de un elemento
+        function copyToClipboard(elementId, fieldName) {
+            const element = getElement(elementId);
+            const textToCopy = element.value || element.textContent; 
+            // Usamos el statusMessage del bloque de Utilidades
+            const statusDiv = getElement('statusMessage');
+            
+            try {
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = textToCopy;
+                tempTextArea.style.position = 'absolute';
+                tempTextArea.style.left = '-9999px';
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                const success = document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+
+                if (success) {
+                    statusDiv.classList.remove('bg-red-600', 'text-white', 'bg-amber-500', 'text-gray-900', 'hidden', 'bg-gray-600');
+                    statusDiv.classList.add('bg-[#e11d48]', 'text-white');
+                    statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg><p class="text-sm font-medium">¡${fieldName} copiado al portapapeles!</p>`;                } else {
+                    statusDiv.classList.remove('hidden', 'bg-[#e11d48]', 'text-white', 'bg-gray-600');
+                    statusDiv.classList.add('bg-amber-500', 'text-gray-900');
+                    statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><p class="text-sm font-medium">Error al copiar ${fieldName}. Copie manualmente desde el recuadro.</p>`;
+                }
+            } catch (err) {
+                 statusDiv.classList.remove('hidden', 'bg-[#e11d48]', 'text-white', 'bg-gray-600');
+                 statusDiv.classList.add('bg-red-600', 'text-white');
+                 statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><p class="text-sm font-medium">Error de navegador. Copie el texto manualmente.</p>`;
+            }
+            statusDiv.classList.remove('hidden');
+            setTimeout(() => {
+                statusDiv.classList.add('hidden');
+            }, 5000);
+        }
+        
+        // Función para copiar una URL directamente (sin elemento HTML)
+        function copyUrlToClipboard(url, fieldName) {
+             // Usamos el statusMessage del bloque de Utilidades
+             const statusDiv = getElement('statusMessage');
+             try {
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = url;
+                tempTextArea.style.position = 'absolute';
+                tempTextArea.style.left = '-9999px';
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                const success = document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+                
+                if (success) {
+                    statusDiv.classList.remove('bg-red-600', 'text-white', 'bg-amber-500', 'text-gray-900', 'hidden', 'bg-gray-600');
+                    statusDiv.classList.add('bg-[#e11d48]', 'text-white');
+                    statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg><p class="text-sm font-medium">¡${fieldName} copiado al portapapeles! URL: ${url}</p>`;                } else {
+                    throw new Error('Fallback copy failed');
+                }
+            } catch (err) {
+                 statusDiv.classList.remove('hidden', 'bg-[#e11d48]', 'text-white', 'bg-gray-600');
+                 statusDiv.classList.add('bg-red-600', 'text-white');
+                 statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><p class="text-sm font-medium">Error al copiar ${fieldName}. Copie la URL manualmente: ${url}</p>`;
+            }
+            statusDiv.classList.remove('hidden');
+            setTimeout(() => {
+                statusDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        // ** FUNCIÓN **: Copiar mensaje de reseñas
+        function copyReviewsMessage() {
+            const statusDiv = getElement('statusMessage');
+            try {
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = REVIEWS_MESSAGE;
+                tempTextArea.style.position = 'absolute';
+                tempTextArea.style.left = '-9999px';
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                const success = document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+
+                if (success) {
+                    statusDiv.classList.remove('bg-red-600', 'text-white', 'bg-amber-500', 'text-gray-900', 'hidden', 'bg-gray-600');
+                    statusDiv.classList.add('bg-[#e11d48]', 'text-white');
+                    statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg><p class="text-sm font-medium">¡Mensaje de Invitación a Opiniones copiado!</p>`;                } else {
+                    throw new Error('Fallback copy failed');
+                }
+            } catch (err) {
+                 statusDiv.classList.remove('hidden', 'bg-[#e11d48]', 'text-white', 'bg-gray-600');
+                 statusDiv.classList.add('bg-red-600', 'text-white');
+                 statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><p class="text-sm font-medium">Error. Copie manualmente: ${REVIEWS_MESSAGE}</p>`;
+            }
+            statusDiv.classList.remove('hidden');
+            setTimeout(() => {
+                statusDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        // --- FUNCIÓN: GENERAR OPCIONES DE HORA (00 a 23) ---
+        function generateTimeOptions() {
+            const startHourSelect = getElement('appointmentStartHour');
+            const endHourSelect = getElement('appointmentEndHour');
+            
+            // Función de ayuda para añadir las 24 horas
+            const addHours = (select) => {
+                for (let i = 0; i < 24; i++) {
+                    const hour = i < 10 ? `0${i}` : `${i}`; // Formato 24h con cero inicial
+                    const option = document.createElement('option');
+                    option.value = hour;
+                    option.textContent = hour;
+                    select.appendChild(option);
+                }
+            };
+            
+            addHours(startHourSelect);
+            addHours(endHourSelect);
+        }
+
+
+        // --- FUNCIONES DE BOTONES DE UTILIDAD ---
+        function toggleTransferData() {
+            const container = getElement('transferDataContainer');
+            const button = getElement('toggleTransferButton');
+            
+            if (container.classList.contains('hidden')) {
+                // Asigna el texto limpio
+                getElement('transferDataText').textContent = TRANSFER_DATA;
+                container.classList.remove('hidden');
+                button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Ocultar Datos de Transferencia`;
+            } else {
+                container.classList.add('hidden');
+                button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>Datos de Transferencia`;
+            }
+        }
+
+
+        // --- FUNCIÓN PARA COPIAR PLANTILLA ---
+        function copyPlantillaText() {
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = TEMPLATE_MESSAGE;
+            tempTextArea.style.position = 'absolute';
+            tempTextArea.style.left = '-9999px';
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            
+            const statusDiv = getElement('statusMessage');
+            statusDiv.classList.remove('bg-red-600', 'text-white', 'bg-amber-500', 'text-gray-900', 'hidden', 'bg-[#e11d48]');
+            statusDiv.classList.add('bg-gray-600', 'text-white');
+            statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> 
+                <p class="text-sm font-medium">¡Plantilla de Auto-Relleno copiada al portapapeles!</p>`;
+            statusDiv.classList.remove('hidden');
+            setTimeout(() => {
+                statusDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        // --- FUNCIÓN DE PROCESAMIENTO DE PEGADO RÁPIDO ---
+        function processPastedData() {
+            const pastedText = getElement('pasteInput').value;
+            if (!pastedText) {
+                alert('Por favor, pegue el texto de la plantilla primero.');
+                return;
+            }
+
+            const extractValue = (label) => {
+                // Regex mejorada para manejar acentos y mayúsculas
+                const regex = new RegExp(`(${label}|${label.normalize("NFD").replace(/[\u0300-\u036f]/g, "")})\\s*:\\s*(.*?)(?=\\n|$)`, 'i');
+                const match = pastedText.match(regex);
+                return match && match[2] ? match[2].trim() : '';
+            };
+
+            // 1. Extraer los datos
+            let name = extractValue('Nombre');
+            let phone = extractValue('Número WhatsApp'); 
+            let email = extractValue('Correo electrónico');
+
+            // 2. Normalizar el Teléfono
+            if (phone) {
+                phone = phone.replace(/[^0-9+]/g, ''); 
+                if (!phone.startsWith('+')) {
+                    phone = '+' + phone; 
+                }
+            }
+
+            // 3. Rellenar los campos del formulario
+            if (name) getElement('clientName').value = name;
+            if (phone) getElement('clientPhone').value = phone;
+            if (email) getElement('clientEmail').value = email; 
+
+            // 4. Feedback visual
+            alert('¡Datos de Nombre, Número WhatsApp y Correo electrónico rellenados exitosamente!');
+            getElement('pasteInput').value = ''; 
+            getElement('clientName').focus(); 
+        }
+        
+        // --- FUNCIÓN PRINCIPAL DE RESUMEN ---
+        function generateSummary(e) {
+            e.preventDefault(); 
+
+            // 1. Obtener valores de los NUEVOS SELECTORES
+            const clientName = getElement('clientName').value.trim();
+            const serviceType = getElement('serviceType').value; 
+            const serviceName = serviceType;
+            const appointmentDate = getElement('appointmentDate').value; 
+            
+            // Lógica para combinar Hora y Minuto de inicio
+            const startHour = getElement('appointmentStartHour').value;
+            const startMinute = getElement('appointmentStartMinute').value;
+            const appointmentStartTime = `${startHour}:${startMinute}`;
+
+            // Lógica para combinar Hora y Minuto de término
+            const endHour = getElement('appointmentEndHour').value;
+            const endMinute = getElement('appointmentEndMinute').value;
+            const appointmentEndTime = `${endHour}:${endMinute}`;
+            
+            const abono = parseInt(getElement('abono').value) || 0; 
+            const manualDescription = getElement('description').value.trim();
+            
+            let clientEmail = getElement('clientEmail').value.trim();
+            if (clientEmail.indexOf('@') === -1 && clientEmail.length > 0) {
+                 clientEmail = clientEmail + '@gmail.com'; 
+            }
+            
+            let clientPhone = getElement('clientPhone').value.trim(); 
+
+            // 2. Validaciones
+             if (!clientName || !clientEmail || !appointmentDate || !appointmentStartTime || !appointmentEndTime || !clientPhone || clientPhone.length < 10) {
+                 const errorText = (!clientPhone || clientPhone.length < 10) ? 'Faltan campos obligatorios o el número de WhatsApp es demasiado corto (debe incluir +569...)' : 'Faltan campos obligatorios por rellenar.';
+                 const statusDiv = getElement('statusMessage');
+                 statusDiv.classList.remove('hidden', 'bg-amber-500', 'text-gray-900', 'bg-[#e11d48]', 'text-white', 'bg-gray-600');
+                 statusDiv.classList.add('bg-red-600', 'text-white');
+                 statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><p class="text-sm font-medium">${errorText}</p>`;
+                 setTimeout(() => { statusDiv.classList.add('hidden'); }, 5000);
+                 return;
+             }
+
+            // 3. Normalizar
+            let normalizedPhone = clientPhone.replace(/[^0-9+]/g, '');
+            if (!normalizedPhone.startsWith('+')) {
+                normalizedPhone = '+' + normalizedPhone; 
+            }
+            const phoneForWhatsapp = normalizedPhone.substring(1); 
+
+            // 4. Cargar Contenido Condicional 
+            const content = SERVICE_CONTENT[serviceType] || SERVICE_CONTENT['Piercing']; 
+            const { details: conditionalDetails } = content;
+
+            // 5. Formatear Abono y Fecha
+            const abonoFormateado = abono.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 });
+            const formattedDate = formatDate(appointmentDate);
+
+            // 6. Bloque de DATOS DE LA CITA (Omite Abono si es 0)
+            const abonoLine = (abono > 0) 
+                ? `💵 *Abono:* *${abonoFormateado}* (Para asegurar el cupo)` 
+                : '';
+                
+            const datosCitaBloque = `
+👤 *Cliente:* ${clientName}
+📧 *Correo:* ${clientEmail}
+📱 *Teléfono:* ${clientPhone} 
+💉 *Servicio:* ${serviceName}
+🗓️ *Fecha:* *${formattedDate}*
+⏰ *Horario:* *${appointmentStartTime} a ${appointmentEndTime}*
+📍 *Lugar:* ${CALENDAR_LOCATION}
+${abonoLine}
+
+${manualDescription ? `📝 *Notas de Servicio:* ${manualDescription}\n` : ''}`.trim();
+
+            
+            // 7. Generación del Mensaje de WhatsApp (¡SOLO SALUDO Y DATOS!)
+            const whatsappText = `
+*✨ ¡Gracias por preferirnos, ${clientName}! Tu cita está confirmada: ✨*
+---
+*DATOS DE LA CITA*
+${datosCitaBloque}
+`.trim();
+
+            // 8. Generación del Mensaje de Calendar (ORDEN FINAL: ENCABEZADO -> CONDICIONES -> DATOS)
+            const calendarDescriptionText = `
+*✨ Cita Confirmada: ${clientName} ✨*
+---
+${conditionalDetails}
+---
+*DATOS DE LA CITA*
+${datosCitaBloque}
+            `.trim();
+
+            // 9. Determinar Calendar Source ID (SRC)
+            let ownerCalendarSrc;
+            let calendarTargetName;
+
+            if (serviceType === 'Tatuaje' || serviceType === 'Reserva de Retoques') {
+                ownerCalendarSrc = TATUAJE_CALENDAR_SRC;
+                calendarTargetName = 'Citas WEB Tatuajes'; 
+            } else {
+                ownerCalendarSrc = PIERCING_CALENDAR_SRC;
+                calendarTargetName = 'Citas WEB Piercing'; 
+            }
+            getElement('calendarTargetName').textContent = calendarTargetName; 
+
+            // 10. Preparar URL de Calendar
+            const startCalendarTime = formatCalendarTimeLocal(appointmentDate, appointmentStartTime);
+            const endCalendarTime = formatCalendarTimeLocal(appointmentDate, appointmentEndTime);
+            const remindersParam = `&reminders=[{"method":"popup","minutes":${REMINDER_MINUTES}}]`;
+            const calendarTitle = `${serviceType} | ${clientName}${manualDescription ? ` (${manualDescription})` : ''} | Abono ${abonoFormateado}`;
+            
+            // LIMPIEZA CLAVE: Mantenemos la limpieza de asteriscos y emojis para la URL.
+            const calendarDetailsCleaned = calendarDescriptionText 
+                .replace(/\*/g, '') 
+                .replace(/---/g, '\n-----\n') 
+                .replace(/➡️/g, '->') 
+                .replace(/[\u2700-\u27BF\uE000-\uF8FF\u2000-\u206F\u2C00-\u2C5F\uFF00-\uFFEF]/g, ''); 
+
+            // 11. Construcción final del enlace a Google Calendar
+            const calendarUrl = `https://calendar.google.com/calendar/r/eventedit?text=${encodeURIComponent(calendarTitle)}&dates=${startCalendarTime}/${endCalendarTime}&details=${encodeURIComponent(calendarDetailsCleaned)}&location=${encodeURIComponent(CALENDAR_LOCATION)}&ctz=${TIMEZONE_CTZ}&src=${encodeURIComponent(ownerCalendarSrc)}&hl=es${remindersParam}&add=${encodeURIComponent(clientEmail)}`;
+
+            // 12. Construcción del enlace de WhatsApp
+            const whatsappEncodedText = encodeURIComponent(whatsappText); 
+            const whatsappUrl = `https://wa.me/${phoneForWhatsapp}?text=${whatsappEncodedText}`;
+            
+            // 13. Mostrar resultados
+            getElement('resumenTexto').textContent = whatsappText;
+            getElement('whatsappLink').href = whatsappUrl;
+            getElement('calendarLink').href = calendarUrl; 
+            
+            // 14. Auto-copiar Mensaje de WhatsApp
+            copyToClipboard('resumenTexto', 'Mensaje de WhatsApp');
+
+            // Desplazarse a los resultados
+            getElement('outputContainer').classList.remove('hidden');
+            getElement('outputContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+
+
+        // --- INICIALIZACIÓN DE LA APP Y LISTENERS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialDate = getTodayDate();
+            
+            // Inicializar campo de fecha
+            getElement('appointmentDate').value = initialDate;
+            
+            // 1. Generar las opciones de horas 00 a 23
+            generateTimeOptions();
+
+            // 2. Horas predefinidas (usando los nuevos IDs)
+            const initialStartHour = '15'; 
+            const initialStartMinute = '30';
+            const initialEndHour = '16'; 
+            const initialEndMinute = '00'; 
+
+            // 3. Inicializar campos de hora y minuto
+            getElement('appointmentStartHour').value = initialStartHour;
+            getElement('appointmentStartMinute').value = initialStartMinute;
+            getElement('appointmentEndHour').value = initialEndHour;
+            getElement('appointmentEndMinute').value = initialEndMinute;
+            
+            // Inicializar abono con el valor por defecto del primer servicio ('Tatuaje': 0)
+            const initialService = getElement('serviceType').value;
+            getElement('abono').value = DEFAULT_ABONOS[initialService] || 0;
+
+
+            // Event Listeners
+            
+            // Auto-rellenar Abono al cambiar el servicio
+            getElement('serviceType').addEventListener('change', (e) => {
+                const selectedService = e.target.value;
+                const defaultAbono = DEFAULT_ABONOS[selectedService] || 0;
+                getElement('abono').value = defaultAbono;
+            });
+            
+            // Botón de Generar
+            getElement('appointmentForm').addEventListener('submit', generateSummary);
+
+            // Botón de Procesar Pegado
+            getElement('processPasteButton').addEventListener('click', processPastedData);
+        });
+    </script>
+</body>
+</html>
