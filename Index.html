@@ -86,7 +86,7 @@
                     </div>
                     <div>
                         <label for="clientPhone" class="block text-sm font-medium text-gray-300">Número WhatsApp (Ej: +569XXXXXXXX) <span class="text-red-500">*</span></label>
-                        <input type="tel" id="clientPhone" required minlength="10" placeholder="+569" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#e11d48] focus:border-[#e11d48]">
+                        <input type="tel" id="clientPhone" required minlength="10" placeholder="+569XXXXXXXX" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#e11d48] focus:border-[#e11d48]">
                     </div>
                     <div>
                         <label for="clientEmail" class="block text-sm font-medium text-gray-300">Correo Electrónico (Para Calendar) <span class="text-red-500">*</span></label>
@@ -199,7 +199,7 @@
         </p>
     </div>
     
-    <script src="content.js"></script>
+    <script src="contents.js"></script>
 
     <script>
         // --- UTILIDADES ---
@@ -252,15 +252,15 @@
                 if (success) {
                     statusDiv.classList.remove('bg-red-600', 'text-white', 'bg-amber-500', 'text-gray-900', 'hidden', 'bg-gray-600');
                     statusDiv.classList.add('bg-[#e11d48]', 'text-white');
-                    statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg><p class="text-sm font-medium">¡${fieldName} copiado al portapapeles!</p>`;                } else {
+                    statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg><p class="text-sm font-medium">¡${fieldName} copiado al portapapeles!</p>`;                } else {
                     statusDiv.classList.remove('hidden', 'bg-[#e11d48]', 'text-white', 'bg-gray-600');
                     statusDiv.classList.add('bg-amber-500', 'text-gray-900');
                     statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><p class="text-sm font-medium">Error al copiar ${fieldName}. Copie manualmente desde el recuadro.</p>`;
                 }
             } catch (err) {
-                 statusDiv.classList.remove('hidden', 'bg-[#e11d48]', 'text-white', 'bg-gray-600');
-                 statusDiv.classList.add('bg-red-600', 'text-white');
-                 statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><p class="text-sm font-medium">Error de navegador. Copie el texto manualmente.</p>`;
+                   statusDiv.classList.remove('hidden', 'bg-[#e11d48]', 'text-white', 'bg-gray-600');
+                   statusDiv.classList.add('bg-red-600', 'text-white');
+                   statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><p class="text-sm font-medium">Error de navegador. Copie el texto manualmente.</p>`;
             }
             statusDiv.classList.remove('hidden');
             setTimeout(() => {
@@ -285,13 +285,13 @@
                 if (success) {
                     statusDiv.classList.remove('bg-red-600', 'text-white', 'bg-amber-500', 'text-gray-900', 'hidden', 'bg-gray-600');
                     statusDiv.classList.add('bg-[#e11d48]', 'text-white');
-                    statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg><p class="text-sm font-medium">¡${fieldName} copiado al portapapeles! URL: ${url}</p>`;                } else {
+                    statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg><p class="text-sm font-medium">¡${fieldName} copiado al portapapeles! URL: ${url}</p>`;                } else {
                     throw new Error('Fallback copy failed');
                 }
             } catch (err) {
-                 statusDiv.classList.remove('hidden', 'bg-[#e11d48]', 'text-white', 'bg-gray-600');
-                 statusDiv.classList.add('bg-red-600', 'text-white');
-                 statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><p class="text-sm font-medium">Error al copiar ${fieldName}. Copie la URL manualmente: ${url}</p>`;
+                   statusDiv.classList.remove('hidden', 'bg-[#e11d48]', 'text-white', 'bg-gray-600');
+                   statusDiv.classList.add('bg-red-600', 'text-white');
+                   statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><p class="text-sm font-medium">Error al copiar ${fieldName}. Copie la URL manualmente: ${url}</p>`;
             }
             statusDiv.classList.remove('hidden');
             setTimeout(() => {
@@ -315,13 +315,13 @@
                 if (success) {
                     statusDiv.classList.remove('bg-red-600', 'text-white', 'bg-amber-500', 'text-gray-900', 'hidden', 'bg-gray-600');
                     statusDiv.classList.add('bg-[#e11d48]', 'text-white');
-                    statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg><p class="text-sm font-medium">¡Mensaje de Invitación a Opiniones copiado!</p>`;                } else {
+                    statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg><p class="text-sm font-medium">¡Mensaje de Invitación a Opiniones copiado!</p>`;                } else {
                     throw new Error('Fallback copy failed');
                 }
             } catch (err) {
-                 statusDiv.classList.remove('hidden', 'bg-[#e11d48]', 'text-white', 'bg-gray-600');
-                 statusDiv.classList.add('bg-red-600', 'text-white');
-                 statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><p class="text-sm font-medium">Error. Copie manualmente: ${REVIEWS_MESSAGE}</p>`;
+                   statusDiv.classList.remove('hidden', 'bg-[#e11d48]', 'text-white', 'bg-gray-600');
+                   statusDiv.classList.add('bg-red-600', 'text-white');
+                   statusDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><p class="text-sm font-medium">Error. Copie manualmente: ${REVIEWS_MESSAGE}</p>`;
             }
             statusDiv.classList.remove('hidden');
             setTimeout(() => {
@@ -329,7 +329,7 @@
             }, 5000);
         }
 
-        // --- FUNCIÓN: GENERAR OPCIONES DE HORA (00 a 23) ---
+        // --- FUNCIÓN ---: Generar opciones de hora (00 a 23)
         function generateTimeOptions() {
             const startHourSelect = getElement('appointmentStartHour');
             const endHourSelect = getElement('appointmentEndHour');
@@ -590,6 +590,7 @@ ${datosCitaBloque}
             getElement('appointmentEndMinute').value = initialEndMinute;
             
             // Inicializar abono con el valor por defecto del primer servicio ('Tatuaje': 0)
+            // Se asume que DEFAULT_ABONOS ya está disponible gracias a la corrección del script src.
             const initialService = getElement('serviceType').value;
             getElement('abono').value = DEFAULT_ABONOS[initialService] || 0;
 
